@@ -26,6 +26,7 @@ defmodule SnatchEx.MixProject do
       {:floki, "~> 0.34"},
       {:jason, "~> 1.4"},
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
+      {:logger_telegram_backend, "~> 3.0"},
       {:mimic, "~> 2.0", only: :test},
       {:multipart, "~> 0.4"},
       {:pdf_generator, "~> 0.6.2"},

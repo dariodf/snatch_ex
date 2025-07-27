@@ -2,6 +2,8 @@ defmodule SnatchEx.Application do
   use Application
 
   def start(_type, _args) do
+    LoggerTelegramBackend.attach()
+
     children = [
       {Finch, name: SnatchEx.Finch},
       SnatchEx.Bot.PollingHandler

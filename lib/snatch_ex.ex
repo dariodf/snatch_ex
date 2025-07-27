@@ -9,7 +9,6 @@ defmodule SnatchEx do
            {:ok, [first_result | _]} <- Scraper.extract_results(site_config, html),
            {:ok, target_html} <- Fetcher.fetch_page(first_result),
            {:ok, content} <- Scraper.extract_content(site_config, target_html),
-           _ <- IO.puts(content),
            {:ok, pdf_binary} <- Renderer.to_pdf(content) do
         {:ok, pdf_binary}
       else
@@ -22,7 +21,7 @@ defmodule SnatchEx do
     [
       %Scraper.SiteConfig{
         search_url: "https://example.com/tabs?search={query}",
-        result_selector: "div.results-list > a",
+        results_selector: "div.results-list > a",
         content_selector: "pre",
         base_url: "https://example.com"
       }

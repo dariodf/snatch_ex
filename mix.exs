@@ -28,7 +28,7 @@ defmodule SnatchEx.MixProject do
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
       {:mimic, "~> 2.0", only: :test},
       {:multipart, "~> 0.4"},
-      {:pdf, "~> 0.7"},
+      {:pdf_generator, "~> 0.6.2"},
       {:plug, "~> 1.16"},
       {:plug_cowboy, "~> 2.7"},
       {:remote_ip, "~> 1.2"},

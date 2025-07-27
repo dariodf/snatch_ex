@@ -5,13 +5,13 @@ defmodule SnatchEx do
 
   def snatch(search_text) do
     Enum.find_value(sites(), fn site ->
-      with {:ok, html} <- Fetcher.search(site.search_url, search_text),
-           base_url <- URI.to_string(%{URI.parse(site.search_url) | query: nil}),
+      with {:ok, html} <- Fetcher.search(site["search_url"], search_text),
+           base_url <- URI.to_string(%{URI.parse(site["search_url"]) | query: nil}),
            {:ok, [first_result | _]} <-
-             Scraper.extract_results(html, site.results_selector, base_url),
+             Scraper.extract_results(html, site["results_selector"], base_url),
            {:ok, target_html} <- Fetcher.fetch_page(first_result),
-           {:ok, content} <- Scraper.extract_content(site.content_selector, target_html),
-           {:ok, pdf_binary} <- Renderer.to_pdf(content) do
+           {:ok, data} <- Scraper.extract_contents(target_html, site["content_selectors"]),
+           {:ok, pdf_binary} <- Renderer.to_pdf(site["template"], data) do
         {:ok, pdf_binary}
       else
         {:ok, []} -> :no_results
@@ -19,24 +19,24 @@ defmodule SnatchEx do
     end)
   end
 
-  defmodule SiteConfig do
-    defstruct [:search_url, :results_selector, :content_selector, :base_url]
-
-    @type t :: %__MODULE__{
-            search_url: String.t(),
-            results_selector: String.t(),
-            content_selector: String.t(),
-            base_url: String.t()
-          }
-  end
-
   defp sites do
-    [
-      %SnatchEx.SiteConfig{
-        search_url: "https://example.com/tabs?search={query}",
-        results_selector: "div.results-list > a",
-        content_selector: "pre"
-      }
-    ]
+    yaml = """
+    - search_url: "https://gametabs.net/tabs?search={query}"
+      results_selector: "div.results-list > a"
+      content_selectors:
+        content: "pre"
+        name: "#tab-page-tab-name"
+        band: "#tab-page-game-name"
+      template: |
+        {name} - {band}
+
+        <pre style="font-size:10px;">
+        {content}
+        </pre>
+    """
+
+    {:ok, parsed} = YamlElixir.read_from_string(yaml)
+
+    parsed
   end
 end

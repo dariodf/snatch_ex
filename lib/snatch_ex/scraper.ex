@@ -8,11 +8,18 @@ defmodule SnatchEx.Scraper do
     |> then(&{:ok, &1})
   end
 
-  def extract_content(selector, html) do
-    html
-    |> Floki.parse_document!()
-    |> Floki.find(selector)
-    |> Floki.text()
-    |> then(&{:ok, %{content: &1}})
+  def extract_contents(html, selectors) do
+    Enum.map(selectors, fn {key, selector} ->
+      value =
+        html
+        |> Floki.parse_document!()
+        |> Floki.find(selector)
+        |> Floki.text()
+        |> then(&Regex.replace(~r/^\s+|\s+$/, &1, ""))
+
+      {key, value}
+    end)
+    |> Enum.into(%{})
+    |> then(&{:ok, &1})
   end
 end

@@ -32,7 +32,8 @@ defmodule SnatchEx.MixProject do
       {:plug, "~> 1.16"},
       {:plug_cowboy, "~> 2.7"},
       {:remote_ip, "~> 1.2"},
-      {:telegex, "~> 1.8"}
+      {:telegex, "~> 1.8"},
+      {:yaml_elixir, "~> 2.9"}
     ]
   end
 end

@@ -10,7 +10,7 @@ defmodule SnatchEx do
       with base_url <- URI.to_string(%{URI.parse(search_config["url"]) | path: nil, query: nil}),
            {:ok, html} <- Fetcher.search(search_config["url"], search_text),
            {:ok, target_url} <- extract_first_result(html, base_url, search_config["selectors"]),
-           {:ok, target_html} <- Fetcher.fetch_page(target_url |> IO.inspect()),
+           {:ok, target_html} <- Fetcher.fetch_page(target_url),
            {:ok, data} <- Scraper.extract_contents(target_url, target_html, config["scraping"]),
            {:ok, pdf_binary} <- Renderer.to_pdf(config["rendering"]["template"], data) do
         {:ok, pdf_binary}

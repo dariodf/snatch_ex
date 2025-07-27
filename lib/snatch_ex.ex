@@ -6,8 +6,9 @@ defmodule SnatchEx do
   def snatch(search_text) do
     Enum.find_value(sites(), fn site ->
       with {:ok, html} <- Fetcher.search(site.search_url, search_text),
+           base_url <- URI.to_string(%{URI.parse(site.search_url) | query: nil}),
            {:ok, [first_result | _]} <-
-             Scraper.extract_results(html, site.results_selector, site.base_url),
+             Scraper.extract_results(html, site.results_selector, base_url),
            {:ok, target_html} <- Fetcher.fetch_page(first_result),
            {:ok, content} <- Scraper.extract_content(site.content_selector, target_html),
            {:ok, pdf_binary} <- Renderer.to_pdf(content) do
@@ -34,8 +35,7 @@ defmodule SnatchEx do
       %SnatchEx.SiteConfig{
         search_url: "https://example.com/tabs?search={query}",
         results_selector: "div.results-list > a",
-        content_selector: "pre",
-        base_url: "https://example.com"
+        content_selector: "pre"
       }
     ]
   end

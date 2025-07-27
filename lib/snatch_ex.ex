@@ -4,11 +4,12 @@ defmodule SnatchEx do
   alias SnatchEx.{Fetcher, Scraper, Renderer}
 
   def snatch(search_text) do
-    Enum.find_value(sites(), fn site_config ->
-      with {:ok, html} <- Fetcher.search(site_config, search_text),
-           {:ok, [first_result | _]} <- Scraper.extract_results(site_config, html),
+    Enum.find_value(sites(), fn site ->
+      with {:ok, html} <- Fetcher.search(site.search_url, search_text),
+           {:ok, [first_result | _]} <-
+             Scraper.extract_results(html, site.results_selector, site.base_url),
            {:ok, target_html} <- Fetcher.fetch_page(first_result),
-           {:ok, content} <- Scraper.extract_content(site_config, target_html),
+           {:ok, content} <- Scraper.extract_content(site.content_selector, target_html),
            {:ok, pdf_binary} <- Renderer.to_pdf(content) do
         {:ok, pdf_binary}
       else
@@ -17,9 +18,20 @@ defmodule SnatchEx do
     end)
   end
 
+  defmodule SiteConfig do
+    defstruct [:search_url, :results_selector, :content_selector, :base_url]
+
+    @type t :: %__MODULE__{
+            search_url: String.t(),
+            results_selector: String.t(),
+            content_selector: String.t(),
+            base_url: String.t()
+          }
+  end
+
   defp sites do
     [
-      %Scraper.SiteConfig{
+      %SnatchEx.SiteConfig{
         search_url: "https://example.com/tabs?search={query}",
         results_selector: "div.results-list > a",
         content_selector: "pre",

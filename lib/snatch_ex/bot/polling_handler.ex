@@ -27,8 +27,8 @@ defmodule SnatchEx.Bot.PollingHandler do
     } = update
 
     case SnatchEx.snatch(text) do
-      {:ok, pdf_binary} ->
-        TelegramAPI.send_pdf(chat_id, text, pdf_binary)
+      {:ok, pdf_binary, data} ->
+        TelegramAPI.send_pdf(chat_id, "#{data["name"]} - #{data["band"]}", pdf_binary)
       {:error, :no_results} ->
         Telegex.send_message(chat_id, "No results for #{text}.")
     end
